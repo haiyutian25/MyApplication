@@ -29,7 +29,7 @@
     <!-- Third step: its headline. -->
     <string name="onboarding_mascots_headline">它们住在设置里。</string>
     <!-- Third step: the line under its headline. -->
-    <string name="onboarding_mascots_detail">幽灵、果冻和茉莉精灵。打开「设置」，再看「吉祥物」。</string>
+    <string name="onboarding_mascots_detail">果冻和茉莉精灵。打开「设置」，再看「吉祥物」。</string>
     <!-- Fourth step: what leads into its headline. -->
     <string name="onboarding_theme_lead">把它变成你的。</string>
     <!-- Fourth step: its headline, above the choice of theme. -->

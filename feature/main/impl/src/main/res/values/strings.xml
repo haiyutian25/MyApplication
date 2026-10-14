@@ -29,7 +29,7 @@
     <!-- Third step: its headline. -->
     <string name="onboarding_mascots_headline">They live in Settings.</string>
     <!-- Third step: the line under its headline. -->
-    <string name="onboarding_mascots_detail">Ghosts, a jelly and a jasmine spirit. Open Settings, then Mascots.</string>
+    <string name="onboarding_mascots_detail">A jelly and a jasmine spirit. Open Settings, then Mascots.</string>
     <!-- Fourth step: what leads into its headline. -->
     <string name="onboarding_theme_lead">Make it yours.</string>
     <!-- Fourth step: its headline, above the choice of theme. -->

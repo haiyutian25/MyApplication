@@ -3,12 +3,12 @@ package com.example.myapplication.feature.main.impl.onboarding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 
 /**
@@ -20,9 +20,9 @@ internal fun OnboardingScreen(
     onFinished: () -> Unit,
     viewModel: OnboardingViewModel = hiltViewModel(),
 ) {
-    val steps = rememberOnboardingSteps()
+    val steps = viewModel.steps
+    val currentStepIndex by viewModel.currentStepIndex.collectAsStateWithLifecycle()
 
-    var currentStepIndex by rememberSaveable { mutableIntStateOf(0) }
     var isFinishing by remember { mutableStateOf(false) }
 
     val currentStep = steps[currentStepIndex]
@@ -36,11 +36,11 @@ internal fun OnboardingScreen(
     }
 
     fun goToNextStep() {
-        if (isLastStep) finishOnboarding() else currentStepIndex++
+        if (isLastStep) finishOnboarding() else viewModel.goToNextStep()
     }
 
     fun goToPreviousStep() {
-        if (currentStepIndex > 0) currentStepIndex--
+        viewModel.goToPreviousStep()
     }
 
     OnboardingFlowScaffold(
@@ -59,7 +59,7 @@ internal fun OnboardingScreen(
         },
         bottomBar = {
             OnboardingFlowBottomBar(
-                label = currentStep.buttonLabel,
+                label = stringResource(id = currentStep.buttonLabelRes),
                 showBack = currentStepIndex > 0,
                 onBack = ::goToPreviousStep,
                 onNext = ::goToNextStep,

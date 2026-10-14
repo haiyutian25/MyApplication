@@ -156,10 +156,13 @@ fun SettingsScreen(
                     )
                     SettingsGroupDivider()
                     LanguageEntry(
+                        appLanguage = state.appLanguage,
                         isMenuExpanded = isLanguageMenuExpanded,
                         onEntryClick = { isLanguageMenuExpanded = !isLanguageMenuExpanded },
                         onLanguageSelect = { language ->
-                            language.apply()
+                            viewModel.trySendAction(
+                                SettingsAction.AppLanguageSelect(appLanguage = language),
+                            )
                             isLanguageMenuExpanded = false
                         },
                     )

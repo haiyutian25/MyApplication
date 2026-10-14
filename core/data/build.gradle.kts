@@ -52,6 +52,7 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:network"))
 
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.process)
     implementation(libs.google.hilt.android)

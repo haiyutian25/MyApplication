@@ -54,6 +54,7 @@ import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -269,7 +270,7 @@ private fun OnboardingStatement(
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = step.lead,
+            text = stringResource(id = step.leadRes),
             style = MaterialTheme.typography.bodyLarge.copy(fontFamily = OnboardingFontFamily),
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
             textAlign = textAlignment,
@@ -279,18 +280,18 @@ private fun OnboardingStatement(
         Spacer(modifier = Modifier.height(10.dp))
 
         StatementHeadline(
-            headline = step.headline,
+            headline = stringResource(id = step.headlineRes),
             isActive = stepsBehind == 0,
             isRainbow = step.hasRainbowHeadline,
             isWideLayout = isWideLayout,
             textAlignment = textAlignment,
         )
 
-        if (step.detail != null) {
+        if (step.detailRes != null) {
             Spacer(modifier = Modifier.height(18.dp))
 
             Text(
-                text = step.detail,
+                text = stringResource(id = step.detailRes),
                 style = MaterialTheme.typography.bodyLarge.copy(fontFamily = OnboardingFontFamily),
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.45f),
                 textAlign = textAlignment,

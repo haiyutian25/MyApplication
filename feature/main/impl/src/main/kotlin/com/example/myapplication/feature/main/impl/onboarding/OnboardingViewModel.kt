@@ -4,7 +4,10 @@ import androidx.lifecycle.ViewModel
 import com.example.myapplication.core.model.AppTheme
 import com.example.myapplication.data.repository.userpreferences.UserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 /**
@@ -33,5 +36,35 @@ class OnboardingViewModel @Inject constructor(
      */
     fun completeOnboarding() {
         userPreferencesRepository.markFirstLaunchComplete()
+    }
+
+    private val mutableCurrentStepIndex: MutableStateFlow<Int> = MutableStateFlow(0)
+
+    /**
+     * The steps the flow walks through, in order.
+     */
+    internal val steps: List<OnboardingStep> = onboardingSteps()
+
+    /**
+     * How far the flow has come: the index of the step the onboarding is showing.
+     */
+    val currentStepIndex: StateFlow<Int> = mutableCurrentStepIndex.asStateFlow()
+
+    /**
+     * Moves on to the step after the current one, if there is one.
+     */
+    fun goToNextStep() {
+        if (mutableCurrentStepIndex.value < steps.lastIndex) {
+            mutableCurrentStepIndex.update { it + 1 }
+        }
+    }
+
+    /**
+     * Moves back to the step before the current one, if there is one.
+     */
+    fun goToPreviousStep() {
+        if (mutableCurrentStepIndex.value > 0) {
+            mutableCurrentStepIndex.update { it - 1 }
+        }
     }
 }

@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
+import com.example.myapplication.core.model.AppLanguage
 import com.example.myapplication.ui.platform.components.SettingsGroupRow
 
 /**
@@ -27,6 +28,7 @@ import com.example.myapplication.ui.platform.components.SettingsGroupRow
  */
 @Composable
 internal fun LanguageEntry(
+    appLanguage: AppLanguage,
     isMenuExpanded: Boolean,
     onEntryClick: () -> Unit,
     onLanguageSelect: (AppLanguage) -> Unit,
@@ -42,7 +44,7 @@ internal fun LanguageEntry(
             showRipple = false,
             trailingContent = {
                 SettingsMenuValue(
-                    text = AppLanguage.current().label(),
+                    text = appLanguage.label(),
                     isExpanded = isMenuExpanded,
                     interactionSource = interactionSource,
                 )
