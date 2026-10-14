@@ -97,10 +97,8 @@ fun SettingsScreen(
     onNavigateBack: () -> Unit,
     onNavigateToMascotsScreen: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
-    appUpdateViewModel: AppUpdateViewModel = hiltViewModel(),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    val appUpdateState by appUpdateViewModel.state.collectAsStateWithLifecycle()
     var isThemeMenuExpanded by rememberSaveable { mutableStateOf(false) }
     var isLanguageMenuExpanded by rememberSaveable { mutableStateOf(false) }
     val outsidePressSource = remember { MutableInteractionSource() }
@@ -176,8 +174,8 @@ fun SettingsScreen(
             }
 
             updateItem(
-                state = appUpdateState,
-                onUpdateClick = appUpdateViewModel::checkForUpdates,
+                state = state.appUpdate,
+                onUpdateClick = { viewModel.trySendAction(SettingsAction.CheckForUpdates) },
             )
         }
 
@@ -186,10 +184,10 @@ fun SettingsScreen(
         )
 
         UpdateDialog(
-            state = appUpdateState,
-            onDownload = appUpdateViewModel::downloadAndInstall,
-            onOpenRelease = appUpdateViewModel::openReleasePage,
-            onDismiss = appUpdateViewModel::dismissUpdate,
+            state = state.appUpdate,
+            onDownload = { viewModel.trySendAction(SettingsAction.DownloadAndInstallUpdate) },
+            onOpenRelease = { viewModel.trySendAction(SettingsAction.OpenReleasePage) },
+            onDismiss = { viewModel.trySendAction(SettingsAction.DismissUpdate) },
         )
     }
 }
