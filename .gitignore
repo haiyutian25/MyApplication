@@ -1,0 +1,27 @@
+# Gradle / Android build outputs (any module)
+build/
+.gradle/
+.kotlin/
+.cxx/
+.externalNativeBuild
+/captures
+
+# Local machine files
+local.properties
+*.iml
+.DS_Store
+
+# IDE
+.idea/
+
+# Tool state that is kept on the machine
+.codebuddy/
+
+# Reference projects that are not part of this repository
+/Emberr-main/
+/taixu/
+
+# Signing material must never be committed
+*.jks
+*.keystore
+keystore.properties

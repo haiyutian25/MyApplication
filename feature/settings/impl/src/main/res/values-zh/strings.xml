@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Settings -->
+    <!-- Content description for the back navigation icon. -->
+    <string name="settings_navigate_back">返回</string>
+    <!-- Title of the group of settings that holds the appearance entries. -->
+    <string name="settings_appearance">外观</string>
+    <!-- Entry that opens the screen that shows the mascot of the app. -->
+    <string name="settings_mascots">吉祥物</string>
+
+    <!-- Mascot showcase -->
+    <!-- Title of the group that shows the jelly mascot. -->
+    <string name="mascots_jelly_bob_title">果冻精灵</string>
+    <!-- What the jelly mascot does, and how to see it. -->
+    <string name="mascots_jelly_bob_description">漂浮、挤压拉伸、眨眼，眼睛还会跟着你的手指移动。</string>
+    <!-- Title of the group that shows the jasmine spirit. -->
+    <string name="mascots_jasmine_title">茉莉精灵</string>
+    <!-- What the jasmine spirit does, and how to see it. -->
+    <string name="mascots_jasmine_description">上下浮动、摇摆、眨眼；按一下，身体会被压扁再弹回来。</string>
+
+    <!-- Appearance settings -->
+    <!-- Title of the theme setting, both in the group on the settings screen and as the header of
+         the theme selection control on the appearance screen. -->
+    <string name="appearance_theme">主题</string>
+    <!-- Title of the language setting, both in the group on the settings screen and as the header of
+         the language selection control on the appearance screen. -->
+    <string name="appearance_language">语言</string>
+    <!-- Language option that follows the language of the device. -->
+    <string name="appearance_language_system">跟随系统</string>
+    <!-- Language option that shows the app in English. -->
+    <string name="appearance_language_english">English</string>
+    <!-- Language option that shows the app in Simplified Chinese. -->
+    <string name="appearance_language_chinese">中文</string>
+    <!-- Theme option that follows the system-wide dark theme setting. -->
+    <string name="appearance_theme_system">跟随系统</string>
+    <!-- Theme option that always uses the light theme. -->
+    <string name="appearance_theme_light">浅色</string>
+    <!-- Theme option that always uses the dark theme. -->
+    <string name="appearance_theme_dark">深色</string>
+
+    <!-- About -->
+    <!-- Title of the group that holds the entry that checks for a newer build of the app. -->
+    <string name="settings_about">关于</string>
+    <!-- Entry that checks the published releases of the app for a newer build. -->
+    <string name="settings_check_updates">检查更新</string>
+    <!-- Value of the update entry while the published releases are being checked. -->
+    <string name="update_checking">检查中…</string>
+    <!-- Title of the dialog that offers a newer build of the app. %1$s is its version. -->
+    <string name="update_available_title">发现新版本 %1$s</string>
+    <!-- Title of the dialog shown when the installed build is the newest one. -->
+    <string name="update_up_to_date_title">已是最新版本</string>
+    <!-- Message of the dialog shown when the installed build is the newest one. %1$s is its version. -->
+    <string name="update_up_to_date_message">版本 %1$s 就是目前发布的最新版本。</string>
+    <!-- Title of the dialog shown when checking or downloading failed. -->
+    <string name="update_failed_title">更新失败</string>
+    <!-- Message of the dialog shown when checking or downloading failed. %1$s is the reason. -->
+    <string name="update_failed_message">%1$s</string>
+    <!-- Action of the update dialog that downloads the newer build and installs it. -->
+    <string name="update_download">下载并安装</string>
+    <!-- Action of the update dialog that opens the release page in a browser. -->
+    <string name="update_open_release">发布页面</string>
+    <!-- Action that closes the update dialog. -->
+    <string name="update_dismiss">取消</string>
+    <!-- Shown in the update dialog while the newer build is being downloaded. -->
+    <string name="update_downloading">正在下载…</string>
+</resources>

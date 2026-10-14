@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- Content description for the icon button that opens the settings screen. -->
+    <string name="home_open_settings">Open settings</string>
+    <!-- Displays the current count held by the home screen. -->
+    <string name="home_count">Count: <xliff:g id="count" example="5">%1$d</xliff:g></string>
+    <!-- Label for the button that increments the count. -->
+    <string name="home_increment">Increment</string>
+
+    <!-- Onboarding -->
+    <!-- Action at the corner of the onboarding that skips the whole flow. -->
+    <string name="onboarding_skip">Skip</string>
+    <!-- Action of a step that has nothing to choose, which moves on to the next one. -->
+    <string name="onboarding_continue">Continue</string>
+    <!-- First step: what leads into its headline. -->
+    <string name="onboarding_welcome_lead">Welcome to</string>
+    <!-- First step: its headline. -->
+    <string name="onboarding_welcome_headline">My Application.</string>
+    <!-- First step: the action that starts the flow. -->
+    <string name="onboarding_welcome_action">Show me around.</string>
+    <!-- Second step: what leads into its headline. -->
+    <string name="onboarding_privacy_lead">No account. No cloud. No trackers.</string>
+    <!-- Second step: its headline. -->
+    <string name="onboarding_privacy_headline">Everything stays on this device.</string>
+    <!-- Second step: the line under its headline. -->
+    <string name="onboarding_privacy_detail">Your settings live on the phone and nothing is sent anywhere.</string>
+    <!-- Third step: what leads into its headline. -->
+    <string name="onboarding_mascots_lead">Meet the mascots.</string>
+    <!-- Third step: its headline. -->
+    <string name="onboarding_mascots_headline">They live in Settings.</string>
+    <!-- Third step: the line under its headline. -->
+    <string name="onboarding_mascots_detail">Ghosts, a jelly and a jasmine spirit. Open Settings, then Mascots.</string>
+    <!-- Fourth step: what leads into its headline. -->
+    <string name="onboarding_theme_lead">Make it yours.</string>
+    <!-- Fourth step: its headline, above the choice of theme. -->
+    <string name="onboarding_theme_headline">Pick a theme.</string>
+    <!-- Fifth step: what leads into its headline. -->
+    <string name="onboarding_done_lead">That is everything.</string>
+    <!-- Fifth step: its headline. -->
+    <string name="onboarding_done_headline">You are all set.</string>
+    <!-- Fifth step: the line under its headline. -->
+    <string name="onboarding_done_detail">Every choice you made here lives in Settings.</string>
+    <!-- Fifth step: the action that leaves the onboarding and opens the app. -->
+    <string name="onboarding_done_action">Start Using My Application</string>
+</resources>

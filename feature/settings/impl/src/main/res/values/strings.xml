@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Settings -->
+    <!-- Content description for the back navigation icon. -->
+    <string name="settings_navigate_back">Navigate back</string>
+    <!-- Title of the group of settings that holds the appearance entries. -->
+    <string name="settings_appearance">Appearance</string>
+    <!-- Entry that opens the screen that shows the mascot of the app. -->
+    <string name="settings_mascots">Mascots</string>
+
+    <!-- Mascot showcase -->
+    <!-- Title of the group that shows the jelly mascot. -->
+    <string name="mascots_jelly_bob_title">Jelly Bob</string>
+    <!-- What the jelly mascot does, and how to see it. -->
+    <string name="mascots_jelly_bob_description">Floats, squashes and stretches, blinks, and follows your finger with its eyes.</string>
+    <!-- Title of the group that shows the jasmine spirit. -->
+    <string name="mascots_jasmine_title">Jasmine</string>
+    <!-- What the jasmine spirit does, and how to see it. -->
+    <string name="mascots_jasmine_description">Bobs, sways and blinks: press it and its body squashes and springs back.</string>
+
+    <!-- Appearance settings -->
+    <!-- Title of the theme setting, both in the group on the settings screen and as the header of
+         the theme selection control on the appearance screen. -->
+    <string name="appearance_theme">Theme</string>
+    <!-- Title of the language setting, both in the group on the settings screen and as the header of
+         the language selection control on the appearance screen. -->
+    <string name="appearance_language">Language</string>
+    <!-- Language option that follows the language of the device. -->
+    <string name="appearance_language_system">System</string>
+    <!-- Language option that shows the app in English. -->
+    <string name="appearance_language_english">English</string>
+    <!-- Language option that shows the app in Simplified Chinese. -->
+    <string name="appearance_language_chinese">中文</string>
+    <!-- Theme option that follows the system-wide dark theme setting. -->
+    <string name="appearance_theme_system">System</string>
+    <!-- Theme option that always uses the light theme. -->
+    <string name="appearance_theme_light">Light</string>
+    <!-- Theme option that always uses the dark theme. -->
+    <string name="appearance_theme_dark">Dark</string>
+
+    <!-- About -->
+    <!-- Title of the group that holds the entry that checks for a newer build of the app. -->
+    <string name="settings_about">About</string>
+    <!-- Entry that checks the published releases of the app for a newer build. -->
+    <string name="settings_check_updates">Check for updates</string>
+    <!-- Value of the update entry while the published releases are being checked. -->
+    <string name="update_checking">Checking…</string>
+    <!-- Title of the dialog that offers a newer build of the app. %1$s is its version. -->
+    <string name="update_available_title">Version %1$s is available</string>
+    <!-- Title of the dialog shown when the installed build is the newest one. -->
+    <string name="update_up_to_date_title">You are up to date</string>
+    <!-- Message of the dialog shown when the installed build is the newest one. %1$s is its version. -->
+    <string name="update_up_to_date_message">Version %1$s is the newest build that has been published.</string>
+    <!-- Title of the dialog shown when checking or downloading failed. -->
+    <string name="update_failed_title">Update failed</string>
+    <!-- Message of the dialog shown when checking or downloading failed. %1$s is the reason. -->
+    <string name="update_failed_message">%1$s</string>
+    <!-- Action of the update dialog that downloads the newer build and installs it. -->
+    <string name="update_download">Download and install</string>
+    <!-- Action of the update dialog that opens the release page in a browser. -->
+    <string name="update_open_release">Release page</string>
+    <!-- Action that closes the update dialog. -->
+    <string name="update_dismiss">Cancel</string>
+    <!-- Shown in the update dialog while the newer build is being downloaded. -->
+    <string name="update_downloading">Downloading…</string>
+</resources>
