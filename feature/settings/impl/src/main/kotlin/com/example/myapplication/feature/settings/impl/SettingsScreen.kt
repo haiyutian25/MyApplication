@@ -16,11 +16,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import android.provider.Settings
+import android.app.Activity
+import android.graphics.Bitmap
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
+import android.view.PixelCopy
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import com.example.myapplication.ui.platform.components.ThemeReveal
-import com.example.myapplication.ui.platform.theme.pageBackgroundColor
 import com.example.myapplication.ui.platform.util.isDarkMode
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -106,8 +118,13 @@ fun SettingsScreen(
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     var isThemeMenuExpanded by rememberSaveable { mutableStateOf(false) }
     var isLanguageMenuExpanded by rememberSaveable { mutableStateOf(false) }
-    var pendingAppTheme by remember { mutableStateOf<AppTheme?>(null) }
+    val isSystemDark = isSystemInDarkTheme()
     val context = LocalContext.current
+    val view = LocalView.current
+    val activity = context as? Activity
+    val mainHandler = remember { Handler(Looper.getMainLooper()) }
+    val scope = rememberCoroutineScope()
+    var previousPage by remember { mutableStateOf<ImageBitmap?>(null) }
     val animationsEnabled = remember {
         Settings.Global.getFloat(
             context.contentResolver,
@@ -123,6 +140,33 @@ fun SettingsScreen(
     // when the screen pauses dismisses it before it can leak into the next screen.
     DismissOnScreenPause(isExpanded = isThemeMenuExpanded) { isThemeMenuExpanded = false }
     DismissOnScreenPause(isExpanded = isLanguageMenuExpanded) { isLanguageMenuExpanded = false }
+
+    // Takes the page as it is on screen now, for the reveal to draw over the page it is switching
+    // to. It is read back from the window rather than recorded while drawing, because the reveal
+    // has to show the page exactly as the eye last saw it. Where it cannot be taken — on the
+    // versions of Android that cannot read a window back, or before the view has a size — the
+    // switch simply goes ahead without a reveal.
+    fun capturePage(usePage: (ImageBitmap?) -> Unit) {
+        val window = activity?.window
+        val width = view.width
+        val height = view.height
+        val hasSize = width > 0 && height > 0
+        val canReadBack = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+        if (window == null || !hasSize || !canReadBack) {
+            usePage(null)
+            return
+        }
+
+        val page = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        PixelCopy.request(
+            window,
+            page,
+            { result ->
+                usePage(if (result == PixelCopy.SUCCESS) page.asImageBitmap() else null)
+            },
+            mainHandler,
+        )
+    }
 
     // While the theme menu is open, a press anywhere outside the row closes it. The row handles its
     // own presses because it is nested deeper: Compose delivers a press to the innermost handler
@@ -160,10 +204,36 @@ fun SettingsScreen(
                         isMenuExpanded = isThemeMenuExpanded,
                         onEntryClick = { isThemeMenuExpanded = !isThemeMenuExpanded },
                         onThemeSelect = { appTheme ->
-                            // The theme is switched when the reveal has covered the page, so that
-                            // the page is already painted in the new theme as it is uncovered.
-                            pendingAppTheme = appTheme
                             isThemeMenuExpanded = false
+                            val isSameLook = appTheme.isDarkMode(isSystemDark) ==
+                                state.appTheme.isDarkMode(isSystemDark)
+                            if (isSameLook) {
+                                // The app is already shown this way, so there is nothing for a
+                                // reveal to uncover: only the choice has to be recorded.
+                                viewModel.trySendAction(
+                                    SettingsAction.AppThemeSelect(appTheme = appTheme),
+                                )
+                            } else {
+                                // The page is taken once the row's menu has closed, and the
+                                // theme is switched as soon as it has been: the reveal then draws
+                                // that page over the new one and opens a circle onto it, so the
+                                // new page itself is seen through the circle as it grows rather
+                                // than being covered by a colour and swapped in at the end.
+                                //
+                                // The chevron of the row rotates back over the next few frames
+                                // after the menu closes, so the capture waits for it to come to
+                                // rest: a page taken before that is left frozen with the chevron
+                                // still pointing up and no menu under it.
+                                scope.launch {
+                                    delay(MENU_CLOSE_SETTLE_MILLIS)
+                                    capturePage { page ->
+                                        if (page != null) previousPage = page
+                                        viewModel.trySendAction(
+                                            SettingsAction.AppThemeSelect(appTheme = appTheme),
+                                        )
+                                    }
+                                }
+                            }
                         },
                     )
                     SettingsGroupDivider()
@@ -204,16 +274,11 @@ fun SettingsScreen(
             onDismiss = { viewModel.trySendAction(SettingsAction.DismissUpdate) },
         )
 
-        pendingAppTheme?.let { appTheme ->
+        previousPage?.let { page ->
             ThemeReveal(
-                color = pageBackgroundColor(isDark = appTheme.isDarkMode()),
+                previousPage = page,
                 animate = animationsEnabled,
-                onCovered = {
-                    viewModel.trySendAction(
-                        SettingsAction.AppThemeSelect(appTheme = appTheme),
-                    )
-                    pendingAppTheme = null
-                },
+                onCovered = { previousPage = null },
             )
         }
     }
@@ -325,6 +390,13 @@ private fun NavigateBackButton(onClick: () -> Unit) {
  * the icon itself while neither the value next to it nor the panel behind them draws one. The
  * press itself is still handled by the row, which keeps the whole panel clickable.
  */
+/**
+ * How long the chevron of a row takes to rotate back once its menu has closed, plus a frame. The
+ * page that a theme switch is about to draw is taken after it, so that the page is frozen as it
+ * really looks rather than part way through closing its menu.
+ */
+private const val MENU_CLOSE_SETTLE_MILLIS = 400L
+
 @Composable
 internal fun SettingsMenuValue(
     text: String,

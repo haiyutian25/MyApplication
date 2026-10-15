@@ -15,7 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ClipOp
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.layout.onSizeChanged
@@ -35,29 +36,29 @@ private val revealEasing = CubicBezierEasing(
 )
 
 /**
- * How long the reveal takes, as in the reveal it is taken from.
+ * How long the reveal takes. The reveal it is taken from takes 700ms; this app runs it slower on
+ * purpose, so that the circle is seen to travel across the page rather than snap over it.
  */
-private const val REVEAL_DURATION_MILLIS = 700
+private const val REVEAL_DURATION_MILLIS = 7000
 
 /**
- * How far past the corner the circle reaches, as a fraction of the distance from the middle of
- * the element to its corner: the `circle(150%)` the reveal it is taken from ends on.
- */
-private const val REVEAL_MAX_RADIUS_FRACTION = 0.75f
-
-/**
- * The theme switch: a circle of [color] — the page of the theme being switched to — grows out of
- * the bottom middle of this element until it covers all of it, and [onCovered] is called at the
- * moment it does, which is when the theme itself is switched. The caller takes this element away
- * again from [onCovered], leaving the new theme on screen.
+ * The theme switch, the way a view transition does it: a circle opens out of the bottom middle of
+ * this element onto the page of the theme being switched to, which is the page the app itself is
+ * already drawing behind this element, so the new page is seen through the circle as it grows —
+ * its words, its icons and all — rather than being painted over and then swapped in.
  *
- * A circle growing from an edge is a reveal, not decoration: it is what a theme switch that keeps
- * the page in place looks like. Pass [animate] as false to skip it and let [onCovered] run at
- * once, which is what the app does when animations are switched off system-wide.
+ * What this element draws is the other way round: [previousPage], the page as it looked before the
+ * switch, over everything the circle has not reached yet. So the page appears to be opened, not
+ * covered: inside the circle is the new page, outside it the old one.
+ *
+ * [onCovered] is called once the circle has covered all of the element. By then the old page has
+ * been drawn over completely, so the caller takes this element away and what is left on screen is
+ * the new page, already drawn in full. Pass [animate] as false to skip the reveal and let
+ * [onCovered] run at once, which is what the app does when animations are switched off system-wide.
  */
 @Composable
 fun ThemeReveal(
-    color: Color,
+    previousPage: ImageBitmap,
     onCovered: () -> Unit,
     modifier: Modifier = Modifier,
     animate: Boolean = true,
@@ -89,8 +90,14 @@ fun ThemeReveal(
                     x = revealedSize.width / 2f,
                     y = revealedSize.height.toFloat(),
                 )
-                val maxRadius = REVEAL_MAX_RADIUS_FRACTION * hypot(
-                    revealedSize.width.toFloat(),
+                // The circle has to reach the furthest corner of the element to cover all of it,
+                // and it starts at the bottom middle: from there that corner is half the width
+                // across and the whole height up. (The reveal this is taken from reaches 150% of
+                // the distance from the middle of the element to its corner, which is enough for
+                // the origin it defaults to but not for one on an edge: a circle that stops at
+                // that radius leaves the far edge of a tall screen uncovered.)
+                val maxRadius = hypot(
+                    revealedSize.width / 2f,
                     revealedSize.height.toFloat(),
                 )
                 val circle = Path().apply {
@@ -99,8 +106,12 @@ fun ThemeReveal(
                     )
                 }
 
-                clipPath(path = circle) {
-                    drawRect(color = color)
+                clipPath(path = circle, clipOp = ClipOp.Difference) {
+                    drawImage(
+                        image = previousPage,
+                        srcSize = IntSize(previousPage.width, previousPage.height),
+                        dstSize = IntSize(revealedSize.width, revealedSize.height),
+                    )
                 }
             },
     )

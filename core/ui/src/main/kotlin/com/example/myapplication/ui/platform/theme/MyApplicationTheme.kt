@@ -62,15 +62,6 @@ private val DarkColorScheme: ColorScheme = darkColorScheme(
 )
 
 /**
- * The colour the page is painted with when the app is shown in [isDark] mode.
- *
- * It is what the theme switch puts on screen before the theme itself changes: the reveal draws the
- * page of the theme it is switching to, one circle of it at a time.
- */
-fun pageBackgroundColor(isDark: Boolean): Color =
-    if (isDark) DarkColorScheme.background else LightColorScheme.background
-
-/**
  * Static wrapper to make accessing the theme components easier.
  */
 object MyApplicationTheme {
