@@ -15,7 +15,12 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import android.provider.Settings
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.ui.platform.LocalContext
+import com.example.myapplication.ui.platform.components.ThemeReveal
+import com.example.myapplication.ui.platform.theme.pageBackgroundColor
+import com.example.myapplication.ui.platform.util.isDarkMode
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -101,6 +106,15 @@ fun SettingsScreen(
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     var isThemeMenuExpanded by rememberSaveable { mutableStateOf(false) }
     var isLanguageMenuExpanded by rememberSaveable { mutableStateOf(false) }
+    var pendingAppTheme by remember { mutableStateOf<AppTheme?>(null) }
+    val context = LocalContext.current
+    val animationsEnabled = remember {
+        Settings.Global.getFloat(
+            context.contentResolver,
+            Settings.Global.ANIMATOR_DURATION_SCALE,
+            1f,
+        ) > 0f
+    }
     val outsidePressSource = remember { MutableInteractionSource() }
 
     // The menu lives in a pop-up window of its own, so it would otherwise outlive this screen for
@@ -146,9 +160,9 @@ fun SettingsScreen(
                         isMenuExpanded = isThemeMenuExpanded,
                         onEntryClick = { isThemeMenuExpanded = !isThemeMenuExpanded },
                         onThemeSelect = { appTheme ->
-                            viewModel.trySendAction(
-                                SettingsAction.AppThemeSelect(appTheme = appTheme),
-                            )
+                            // The theme is switched when the reveal has covered the page, so that
+                            // the page is already painted in the new theme as it is uncovered.
+                            pendingAppTheme = appTheme
                             isThemeMenuExpanded = false
                         },
                     )
@@ -189,6 +203,19 @@ fun SettingsScreen(
             onOpenRelease = { viewModel.trySendAction(SettingsAction.OpenReleasePage) },
             onDismiss = { viewModel.trySendAction(SettingsAction.DismissUpdate) },
         )
+
+        pendingAppTheme?.let { appTheme ->
+            ThemeReveal(
+                color = pageBackgroundColor(isDark = appTheme.isDarkMode()),
+                animate = animationsEnabled,
+                onCovered = {
+                    viewModel.trySendAction(
+                        SettingsAction.AppThemeSelect(appTheme = appTheme),
+                    )
+                    pendingAppTheme = null
+                },
+            )
+        }
     }
 }
 
