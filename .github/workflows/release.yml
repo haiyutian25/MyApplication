@@ -27,6 +27,8 @@ jobs:
 
     permissions:
       contents: write
+      # Needed to drop the caches that an earlier run of this workflow left on GitHub.
+      actions: write
 
     steps:
       - name: Checkout Code
@@ -48,12 +50,14 @@ jobs:
           echo "TARGET_TAG=$TAG" >> "$GITHUB_ENV"
           echo "Using version tag: $TAG"
 
+      # The run keeps no Gradle cache: nothing of a build is left behind on GitHub. The runner
+      # itself is thrown away with everything it downloaded, and what this workflow used to cache
+      # between runs is dropped again at the end.
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '21'
-          cache: 'gradle'
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
@@ -181,13 +185,6 @@ jobs:
 
           echo "RELEASE_NOTES_FILE=release_notes.md" >> $GITHUB_ENV
 
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-apk
-          path: output/*
-          retention-days: 30
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -202,3 +199,14 @@ jobs:
           make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Nothing of a run is kept behind: whatever caches an earlier run of this workflow left on
+      # GitHub are dropped, whether this one got as far as publishing or not. The release itself is
+      # untouched — it is an asset of the release, not of the run.
+      - name: Purge Build Caches
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh cache delete --all --repo "${{ github.repository }}" || true
