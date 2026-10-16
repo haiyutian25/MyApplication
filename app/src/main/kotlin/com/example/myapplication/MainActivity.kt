@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.myapplication.ui.platform.navigation.MyApplicationNavDisplay
-import com.example.myapplication.ui.platform.theme.MyApplicationTheme
+import com.example.myapplication.ui.platform.theme.ThemeSwitchHost
 import com.example.myapplication.ui.platform.util.isDarkMode
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         setContent {
             val state by mainViewModel.stateFlow.collectAsStateWithLifecycle()
 
-            MyApplicationTheme(isDarkMode = state.appTheme.isDarkMode()) {
+            ThemeSwitchHost(isDarkMode = state.appTheme.isDarkMode()) {
                 MyApplicationNavDisplay(isFirstLaunch = state.isFirstLaunch)
             }
         }

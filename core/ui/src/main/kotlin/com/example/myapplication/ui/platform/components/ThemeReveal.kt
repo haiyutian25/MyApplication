@@ -53,29 +53,26 @@ private const val REVEAL_DURATION_MILLIS = 7000
  *
  * [onCovered] is called once the circle has covered all of the element. By then the old page has
  * been drawn over completely, so the caller takes this element away and what is left on screen is
- * the new page, already drawn in full. Pass [animate] as false to skip the reveal and let
- * [onCovered] run at once, which is what the app does when animations are switched off system-wide.
+ * the new page, already drawn in full. Whether a reveal is shown at all is decided where the theme
+ * is applied, which leaves this out when animations are switched off system-wide.
  */
 @Composable
 fun ThemeReveal(
     previousPage: ImageBitmap,
     onCovered: () -> Unit,
     modifier: Modifier = Modifier,
-    animate: Boolean = true,
 ) {
     var revealedSize by remember { mutableStateOf(IntSize.Zero) }
-    val progress = remember { Animatable(initialValue = if (animate) 0f else 1f) }
+    val progress = remember { Animatable(initialValue = 0f) }
 
-    LaunchedEffect(key1 = animate) {
-        if (animate) {
-            progress.animateTo(
-                targetValue = 1f,
-                animationSpec = tween(
-                    durationMillis = REVEAL_DURATION_MILLIS,
-                    easing = revealEasing,
-                ),
-            )
-        }
+    LaunchedEffect(key1 = Unit) {
+        progress.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(
+                durationMillis = REVEAL_DURATION_MILLIS,
+                easing = revealEasing,
+            ),
+        )
         onCovered()
     }
 

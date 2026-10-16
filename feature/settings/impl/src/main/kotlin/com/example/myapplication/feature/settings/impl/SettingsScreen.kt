@@ -15,21 +15,9 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import android.provider.Settings
-import android.app.Activity
-import android.graphics.Bitmap
-import android.os.Build
-import android.os.Handler
-import android.os.Looper
-import android.view.PixelCopy
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import com.example.myapplication.ui.platform.components.ThemeReveal
 import com.example.myapplication.ui.platform.util.isDarkMode
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -119,19 +107,7 @@ fun SettingsScreen(
     var isThemeMenuExpanded by rememberSaveable { mutableStateOf(false) }
     var isLanguageMenuExpanded by rememberSaveable { mutableStateOf(false) }
     val isSystemDark = isSystemInDarkTheme()
-    val context = LocalContext.current
-    val view = LocalView.current
-    val activity = context as? Activity
-    val mainHandler = remember { Handler(Looper.getMainLooper()) }
     val scope = rememberCoroutineScope()
-    var previousPage by remember { mutableStateOf<ImageBitmap?>(null) }
-    val animationsEnabled = remember {
-        Settings.Global.getFloat(
-            context.contentResolver,
-            Settings.Global.ANIMATOR_DURATION_SCALE,
-            1f,
-        ) > 0f
-    }
     val outsidePressSource = remember { MutableInteractionSource() }
 
     // The menu lives in a pop-up window of its own, so it would otherwise outlive this screen for
@@ -140,33 +116,6 @@ fun SettingsScreen(
     // when the screen pauses dismisses it before it can leak into the next screen.
     DismissOnScreenPause(isExpanded = isThemeMenuExpanded) { isThemeMenuExpanded = false }
     DismissOnScreenPause(isExpanded = isLanguageMenuExpanded) { isLanguageMenuExpanded = false }
-
-    // Takes the page as it is on screen now, for the reveal to draw over the page it is switching
-    // to. It is read back from the window rather than recorded while drawing, because the reveal
-    // has to show the page exactly as the eye last saw it. Where it cannot be taken — on the
-    // versions of Android that cannot read a window back, or before the view has a size — the
-    // switch simply goes ahead without a reveal.
-    fun capturePage(usePage: (ImageBitmap?) -> Unit) {
-        val window = activity?.window
-        val width = view.width
-        val height = view.height
-        val hasSize = width > 0 && height > 0
-        val canReadBack = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
-        if (window == null || !hasSize || !canReadBack) {
-            usePage(null)
-            return
-        }
-
-        val page = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        PixelCopy.request(
-            window,
-            page,
-            { result ->
-                usePage(if (result == PixelCopy.SUCCESS) page.asImageBitmap() else null)
-            },
-            mainHandler,
-        )
-    }
 
     // While the theme menu is open, a press anywhere outside the row closes it. The row handles its
     // own presses because it is nested deeper: Compose delivers a press to the innermost handler
@@ -214,24 +163,18 @@ fun SettingsScreen(
                                     SettingsAction.AppThemeSelect(appTheme = appTheme),
                                 )
                             } else {
-                                // The page is taken once the row's menu has closed, and the
-                                // theme is switched as soon as it has been: the reveal then draws
-                                // that page over the new one and opens a circle onto it, so the
-                                // new page itself is seen through the circle as it grows rather
-                                // than being covered by a colour and swapped in at the end.
-                                //
-                                // The chevron of the row rotates back over the next few frames
-                                // after the menu closes, so the capture waits for it to come to
-                                // rest: a page taken before that is left frozen with the chevron
-                                // still pointing up and no menu under it.
+                                // The mode itself is switched above this screen, by the host that
+                                // applies the theme and opens the reveal for every switch. All
+                                // this has to do is ask for it once the row's menu is out of the
+                                // way: the chevron rotates back over the next few frames after it
+                                // closes, and the reveal takes the page as it is when the mode
+                                // changes, so a switch asked for before that would freeze the
+                                // chevron pointing up with no menu under it.
                                 scope.launch {
                                     delay(MENU_CLOSE_SETTLE_MILLIS)
-                                    capturePage { page ->
-                                        if (page != null) previousPage = page
-                                        viewModel.trySendAction(
-                                            SettingsAction.AppThemeSelect(appTheme = appTheme),
-                                        )
-                                    }
+                                    viewModel.trySendAction(
+                                        SettingsAction.AppThemeSelect(appTheme = appTheme),
+                                    )
                                 }
                             }
                         },
@@ -273,14 +216,6 @@ fun SettingsScreen(
             onOpenRelease = { viewModel.trySendAction(SettingsAction.OpenReleasePage) },
             onDismiss = { viewModel.trySendAction(SettingsAction.DismissUpdate) },
         )
-
-        previousPage?.let { page ->
-            ThemeReveal(
-                previousPage = page,
-                animate = animationsEnabled,
-                onCovered = { previousPage = null },
-            )
-        }
     }
 }
 
