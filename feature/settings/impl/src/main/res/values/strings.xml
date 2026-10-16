@@ -63,4 +63,16 @@
     <string name="update_dismiss">Cancel</string>
     <!-- Shown in the update dialog while the newer build is being downloaded. -->
     <string name="update_downloading">Downloading…</string>
+
+    <!-- About screen -->
+    <!-- Entry that opens the screen that says what the app is. -->
+    <string name="settings_about_entry">About</string>
+    <!-- Name of the app, as shown on the about screen. -->
+    <string name="about_app_name">My Application</string>
+    <!-- Version of the installed build, on the about screen. %1$s is the version. -->
+    <string name="about_version">Version %1$s</string>
+    <!-- What the app is, on the about screen. -->
+    <string name="about_description">A small app that keeps a count, and shows what the theme, the language and the mascots do. Everything stays on the device: no account, and nothing sent anywhere.</string>
+    <!-- Who the app is by, at the foot of the about screen. -->
+    <string name="about_copyright">© 2026 My Application. All rights reserved.</string>
 </resources>

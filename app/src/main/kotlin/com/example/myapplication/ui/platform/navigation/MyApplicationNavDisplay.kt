@@ -11,8 +11,10 @@ import com.example.myapplication.feature.main.api.HomeRoute
 import com.example.myapplication.feature.main.api.RootNavRoute
 import com.example.myapplication.feature.main.impl.HomeScreen
 import com.example.myapplication.feature.main.impl.RootNavScreen
+import com.example.myapplication.feature.settings.api.AboutRoute
 import com.example.myapplication.feature.settings.api.MascotsRoute
 import com.example.myapplication.feature.settings.api.SettingsRoute
+import com.example.myapplication.feature.settings.impl.AboutScreen
 import com.example.myapplication.feature.settings.impl.MascotsScreen
 import com.example.myapplication.feature.settings.impl.SettingsScreen
 
@@ -70,7 +72,13 @@ fun MyApplicationNavDisplay(
             entry<SettingsRoute> {
                 SettingsScreen(
                     onNavigateBack = { backStack.removeLastOrNull() },
+                    onNavigateToAboutScreen = { backStack.add(AboutRoute) },
                     onNavigateToMascotsScreen = { backStack.add(MascotsRoute) },
+                )
+            }
+            entry<AboutRoute> {
+                AboutScreen(
+                    onNavigateBack = { backStack.removeLastOrNull() },
                 )
             }
             entry<MascotsRoute> {

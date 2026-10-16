@@ -55,7 +55,8 @@ private val SettingsGroupTitleSpacing: Dp = 10.dp
 
 /**
  * A card that groups related settings entries into a single raised panel, introduced by a title
- * that labels what the group is about.
+ * that labels what the group is about. A panel that speaks for itself is drawn without one, by
+ * leaving the title out.
  *
  * The panel uses the `surfaceContainerLow` color role, so it stands out against the page background
  * the same way a card does on the page background of the design this app follows. It is wrapped in
@@ -67,7 +68,7 @@ private val SettingsGroupTitleSpacing: Dp = 10.dp
  */
 @Composable
 fun SettingsGroup(
-    title: String,
+    title: String? = null,
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -76,7 +77,9 @@ fun SettingsGroup(
             .fillMaxWidth()
             .padding(horizontal = SettingsGroupHorizontalPadding),
     ) {
-        SettingsGroupTitle(text = title)
+        if (title != null) {
+            SettingsGroupTitle(text = title)
+        }
 
         Surface(
             modifier = Modifier.fillMaxWidth(),

@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.runtime.rememberCoroutineScope
 import com.example.myapplication.ui.platform.util.isDarkMode
 import kotlinx.coroutines.delay
@@ -100,6 +99,7 @@ private const val CHEVRON_EXPANDED_ROTATION = 180f
 @Composable
 fun SettingsScreen(
     onNavigateBack: () -> Unit,
+    onNavigateToAboutScreen: () -> Unit,
     onNavigateToMascotsScreen: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
@@ -200,21 +200,19 @@ fun SettingsScreen(
                 }
             }
 
-            updateItem(
-                state = state.appUpdate,
-                onUpdateClick = { viewModel.trySendAction(SettingsAction.CheckForUpdates) },
-            )
+            item {
+                SettingsGroup(title = stringResource(id = R.string.settings_about)) {
+                    NavigateEntry(
+                        icon = Icons.Outlined.Info,
+                        title = stringResource(id = R.string.settings_about_entry),
+                        onClick = onNavigateToAboutScreen,
+                    )
+                }
+            }
         }
 
         ImmersiveTopBar(
             leadingContent = { NavigateBackButton(onClick = onNavigateBack) },
-        )
-
-        UpdateDialog(
-            state = state.appUpdate,
-            onDownload = { viewModel.trySendAction(SettingsAction.DownloadAndInstallUpdate) },
-            onOpenRelease = { viewModel.trySendAction(SettingsAction.OpenReleasePage) },
-            onDismiss = { viewModel.trySendAction(SettingsAction.DismissUpdate) },
         )
     }
 }
@@ -307,7 +305,7 @@ private fun NavigateEntry(
 }
 
 @Composable
-private fun NavigateBackButton(onClick: () -> Unit) {
+internal fun NavigateBackButton(onClick: () -> Unit) {
     ImmersiveTopBarIconButton(onClick = onClick) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -377,16 +375,17 @@ private fun AppTheme.label(): String = stringResource(
  */
 
 /**
- * The group of the screen that holds the entry that checks for a newer build of the app.
+ * The panel that holds the entry that checks for a newer build of the app, which the about screen
+ * shows under what the app is. It carries no title: on that screen it has nothing to introduce it
+ * to, and says what it is by itself.
  */
-private fun LazyListScope.updateItem(
+@Composable
+internal fun UpdatePanel(
     state: AppUpdateUiState,
     onUpdateClick: () -> Unit,
 ) {
-    item {
-        SettingsGroup(title = stringResource(id = R.string.settings_about)) {
-            UpdateEntry(state = state, onClick = onUpdateClick)
-        }
+    SettingsGroup {
+        UpdateEntry(state = state, onClick = onUpdateClick)
     }
 }
 
@@ -399,7 +398,7 @@ private fun LazyListScope.updateItem(
  * press will do.
  */
 @Composable
-private fun UpdateEntry(
+internal fun UpdateEntry(
     state: AppUpdateUiState,
     onClick: () -> Unit,
 ) {
@@ -436,7 +435,7 @@ private fun AppUpdateUiState.entryLabel(): String = if (isChecking) {
  */
 @Suppress("LongMethod") // The dialog is one layout: what it says, the progress and its actions.
 @Composable
-private fun UpdateDialog(
+internal fun UpdateDialog(
     state: AppUpdateUiState,
     onDownload: () -> Unit,
     onOpenRelease: () -> Unit,

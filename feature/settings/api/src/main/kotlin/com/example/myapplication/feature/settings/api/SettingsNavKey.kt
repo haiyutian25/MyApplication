@@ -19,6 +19,13 @@ sealed interface SettingsNavKey : NavKey {
      */
     @Serializable
     data object Mascots : SettingsNavKey
+
+    /**
+     * Screen that says what the app is — its name, its version and what it does — and where a newer
+     * build of it is looked for.
+     */
+    @Serializable
+    data object About : SettingsNavKey
 }
 
 /**
@@ -30,3 +37,8 @@ typealias SettingsRoute = SettingsNavKey.Settings
  * Backward-compatible alias for the mascots route.
  */
 typealias MascotsRoute = SettingsNavKey.Mascots
+
+/**
+ * Backward-compatible alias for the about route.
+ */
+typealias AboutRoute = SettingsNavKey.About

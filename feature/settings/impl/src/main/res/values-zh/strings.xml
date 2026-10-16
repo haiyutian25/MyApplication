@@ -63,4 +63,16 @@
     <string name="update_dismiss">取消</string>
     <!-- Shown in the update dialog while the newer build is being downloaded. -->
     <string name="update_downloading">正在下载…</string>
+
+    <!-- About screen -->
+    <!-- Entry that opens the screen that says what the app is. -->
+    <string name="settings_about_entry">关于</string>
+    <!-- Name of the app, as shown on the about screen. -->
+    <string name="about_app_name">My Application</string>
+    <!-- Version of the installed build, on the about screen. %1$s is the version. -->
+    <string name="about_version">版本 %1$s</string>
+    <!-- What the app is, on the about screen. -->
+    <string name="about_description">一个用来计数的小应用，同时展示主题、语言和吉祥物的效果。所有内容都留在本机：不需要账号，也不会把任何数据发送出去。</string>
+    <!-- Who the app is by, at the foot of the about screen. -->
+    <string name="about_copyright">© 2026 My Application 版权所有</string>
 </resources>
