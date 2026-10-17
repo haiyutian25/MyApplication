@@ -104,8 +104,9 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    var isThemeMenuExpanded by rememberSaveable { mutableStateOf(false) }
-    var isLanguageMenuExpanded by rememberSaveable { mutableStateOf(false) }
+    // One menu of a group is open at a time, so which one it is is the whole of what the screen
+    // has to remember about them: opening a menu is what closes the other.
+    var expandedMenu by rememberSaveable { mutableStateOf<SettingsMenu?>(null) }
     val isSystemDark = isSystemInDarkTheme()
     val scope = rememberCoroutineScope()
     val outsidePressSource = remember { MutableInteractionSource() }
@@ -114,25 +115,21 @@ fun SettingsScreen(
     // as long as the navigation transition keeps the screen composed, floating over the screen
     // being revealed. Navigation 3 gives every destination its own lifecycle, so closing the menu
     // when the screen pauses dismisses it before it can leak into the next screen.
-    DismissOnScreenPause(isExpanded = isThemeMenuExpanded) { isThemeMenuExpanded = false }
-    DismissOnScreenPause(isExpanded = isLanguageMenuExpanded) { isLanguageMenuExpanded = false }
+    DismissOnScreenPause(isExpanded = expandedMenu != null) { expandedMenu = null }
 
-    // While the theme menu is open, a press anywhere outside the row closes it. The row handles its
-    // own presses because it is nested deeper: Compose delivers a press to the innermost handler
-    // first and stops there once it is consumed, so this layer only ever receives the presses that
-    // land on the page behind the panel. It draws no ripple, so the feedback stays on the chevron.
+    // While a menu is open, a press anywhere outside the row closes it. The row handles its own
+    // presses because it is nested deeper: Compose delivers a press to the innermost handler first
+    // and stops there once it is consumed, so this layer only ever receives the presses that land
+    // on the page behind the panel. It draws no ripple, so the feedback stays on the chevron.
     Box(
         modifier = Modifier
             .fillMaxSize()
             .then(
-                if (isThemeMenuExpanded || isLanguageMenuExpanded) {
+                if (expandedMenu != null) {
                     Modifier.clickable(
                         interactionSource = outsidePressSource,
                         indication = null,
-                        onClick = {
-                            isThemeMenuExpanded = false
-                            isLanguageMenuExpanded = false
-                        },
+                        onClick = { expandedMenu = null },
                     )
                 } else {
                     Modifier
@@ -150,10 +147,16 @@ fun SettingsScreen(
                 SettingsGroup(title = stringResource(id = R.string.settings_appearance)) {
                     ThemeEntry(
                         appTheme = state.appTheme,
-                        isMenuExpanded = isThemeMenuExpanded,
-                        onEntryClick = { isThemeMenuExpanded = !isThemeMenuExpanded },
+                        isMenuExpanded = expandedMenu == SettingsMenu.THEME,
+                        onEntryClick = {
+                            expandedMenu = if (expandedMenu == SettingsMenu.THEME) {
+                                null
+                            } else {
+                                SettingsMenu.THEME
+                            }
+                        },
                         onThemeSelect = { appTheme ->
-                            isThemeMenuExpanded = false
+                            expandedMenu = null
                             val isSameLook = appTheme.isDarkMode(isSystemDark) ==
                                 state.appTheme.isDarkMode(isSystemDark)
                             if (isSameLook) {
@@ -182,13 +185,19 @@ fun SettingsScreen(
                     SettingsGroupDivider()
                     LanguageEntry(
                         appLanguage = state.appLanguage,
-                        isMenuExpanded = isLanguageMenuExpanded,
-                        onEntryClick = { isLanguageMenuExpanded = !isLanguageMenuExpanded },
+                        isMenuExpanded = expandedMenu == SettingsMenu.LANGUAGE,
+                        onEntryClick = {
+                            expandedMenu = if (expandedMenu == SettingsMenu.LANGUAGE) {
+                                null
+                            } else {
+                                SettingsMenu.LANGUAGE
+                            }
+                        },
                         onLanguageSelect = { language ->
                             viewModel.trySendAction(
                                 SettingsAction.AppLanguageSelect(appLanguage = language),
                             )
-                            isLanguageMenuExpanded = false
+                            expandedMenu = null
                         },
                     )
                     SettingsGroupDivider()
@@ -215,6 +224,24 @@ fun SettingsScreen(
             leadingContent = { NavigateBackButton(onClick = onNavigateBack) },
         )
     }
+}
+
+/**
+ * The entry of a group whose menu is open.
+ *
+ * Only one menu is open at a time, so which one it is is the whole of the state the screen keeps
+ * for them, and opening one is what closes the other.
+ */
+private enum class SettingsMenu {
+    /**
+     * The menu of the theme entry.
+     */
+    THEME,
+
+    /**
+     * The menu of the language entry.
+     */
+    LANGUAGE,
 }
 
 /**
