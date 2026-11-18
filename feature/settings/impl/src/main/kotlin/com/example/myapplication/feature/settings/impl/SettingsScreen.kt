@@ -26,6 +26,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
@@ -101,6 +102,7 @@ fun SettingsScreen(
     onNavigateBack: () -> Unit,
     onNavigateToAboutScreen: () -> Unit,
     onNavigateToMascotsScreen: () -> Unit,
+    onNavigateToParticleTextScreen: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
@@ -205,6 +207,12 @@ fun SettingsScreen(
                         icon = Icons.Outlined.Face,
                         title = stringResource(id = R.string.settings_mascots),
                         onClick = onNavigateToMascotsScreen,
+                    )
+                    SettingsGroupDivider()
+                    NavigateEntry(
+                        icon = Icons.Outlined.PlayArrow,
+                        title = stringResource(id = R.string.settings_particle_text),
+                        onClick = onNavigateToParticleTextScreen,
                     )
                 }
             }

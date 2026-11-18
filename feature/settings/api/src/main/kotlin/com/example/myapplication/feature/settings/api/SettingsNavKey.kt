@@ -26,6 +26,13 @@ sealed interface SettingsNavKey : NavKey {
      */
     @Serializable
     data object About : SettingsNavKey
+
+    /**
+     * Screen that plays the particle text reel: a galaxy of particles assembles into a word,
+     * detonates, and leaves the solid word behind.
+     */
+    @Serializable
+    data object ParticleText : SettingsNavKey
 }
 
 /**
@@ -42,3 +49,8 @@ typealias MascotsRoute = SettingsNavKey.Mascots
  * Backward-compatible alias for the about route.
  */
 typealias AboutRoute = SettingsNavKey.About
+
+/**
+ * Backward-compatible alias for the particle text route.
+ */
+typealias ParticleTextRoute = SettingsNavKey.ParticleText

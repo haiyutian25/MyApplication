@@ -7,6 +7,8 @@
     <string name="settings_appearance">外观</string>
     <!-- Entry that opens the screen that shows the mascot of the app. -->
     <string name="settings_mascots">吉祥物</string>
+    <!-- Entry that opens the screen that plays the particle text reel. -->
+    <string name="settings_particle_text">粒子文字</string>
 
     <!-- Mascot showcase -->
     <!-- Title of the group that shows the jelly mascot. -->
@@ -75,4 +77,8 @@
     <string name="about_description">一个用来计数的小应用，同时展示主题、语言和吉祥物的效果。所有内容都留在本机：不需要账号，也不会把任何数据发送出去。</string>
     <!-- Who the app is by, at the foot of the about screen. -->
     <string name="about_copyright">© 2026 My Application 版权所有</string>
+
+    <!-- Particle text screen -->
+    <!-- Shown at the foot of the particle text screen, which restarts the reel on a tap. -->
+    <string name="particle_text_hint">轻点任意处重播</string>
 </resources>

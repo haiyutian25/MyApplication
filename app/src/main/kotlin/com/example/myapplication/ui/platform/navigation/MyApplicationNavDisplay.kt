@@ -13,9 +13,11 @@ import com.example.myapplication.feature.main.impl.HomeScreen
 import com.example.myapplication.feature.main.impl.RootNavScreen
 import com.example.myapplication.feature.settings.api.AboutRoute
 import com.example.myapplication.feature.settings.api.MascotsRoute
+import com.example.myapplication.feature.settings.api.ParticleTextRoute
 import com.example.myapplication.feature.settings.api.SettingsRoute
 import com.example.myapplication.feature.settings.impl.AboutScreen
 import com.example.myapplication.feature.settings.impl.MascotsScreen
+import com.example.myapplication.feature.settings.impl.ParticleTextScreen
 import com.example.myapplication.feature.settings.impl.SettingsScreen
 
 /**
@@ -74,6 +76,12 @@ fun MyApplicationNavDisplay(
                     onNavigateBack = { backStack.removeLastOrNull() },
                     onNavigateToAboutScreen = { backStack.add(AboutRoute) },
                     onNavigateToMascotsScreen = { backStack.add(MascotsRoute) },
+                    onNavigateToParticleTextScreen = { backStack.add(ParticleTextRoute) },
+                )
+            }
+            entry<ParticleTextRoute> {
+                ParticleTextScreen(
+                    onNavigateBack = { backStack.removeLastOrNull() },
                 )
             }
             entry<AboutRoute> {
