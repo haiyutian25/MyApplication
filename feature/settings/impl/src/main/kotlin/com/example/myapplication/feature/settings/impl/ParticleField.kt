@@ -1,5 +1,5 @@
-// The reel is copied from another app's source: its choreography is expressed as raw pixel ratios
-// and seconds, so the file level magic number rule is waived for it.
+// The field is drawn from raw pixel ratios and seconds, so the file level magic number rule is
+// waived for it.
 @file:Suppress("MagicNumber", "DEPRECATION")
 
 package com.example.myapplication.feature.settings.impl

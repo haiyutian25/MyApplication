@@ -1,11 +1,12 @@
-// The reel is copied from another app's source: its choreography is expressed as raw pixel ratios
-// and seconds, so the file level magic number rule is waived for it.
+// The reel's choreography is expressed as raw pixel ratios and seconds, so the file level magic
+// number rule is waived for it.
 @file:Suppress("MagicNumber")
 
 package com.example.myapplication.feature.settings.impl
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -54,9 +55,9 @@ import com.example.myapplication.ui.platform.theme.MyApplicationTheme
 import kotlin.math.hypot
 
 /**
- * The word the particles assemble into.
+ * The word the particles assemble into: the name the app is listed under.
  */
-private const val PARTICLE_WORD = "Claude"
+private const val PARTICLE_WORD = "My Application"
 
 /**
  * One loop of the reel, in seconds.
@@ -94,14 +95,16 @@ private const val CLOSE_ZOOM = 0.35f
 private const val NANOS_PER_SECOND = 1_000_000_000f
 
 /**
- * The screen that plays the particle text reel: a galaxy of particles flies into the word,
- * inhales, detonates, and leaves the solid word behind. The reel loops every few seconds, and a
- * tap anywhere restarts it from the top.
+ * The reel itself: a galaxy of particles flies into the word, inhales, detonates, and leaves the
+ * solid word behind, looping every few seconds.
+ *
+ * The screen that shows it from the settings and the one the app opens with both draw this; each
+ * adds what belongs to it over the top, and the reel owns only what is drawn.
  */
 @Composable
-fun ParticleTextScreen(
-    onNavigateBack: () -> Unit,
+internal fun ParticleReel(
     modifier: Modifier = Modifier,
+    restartOnTap: Boolean = true,
 ) {
     val density = LocalDensity.current
     val measurer = rememberTextMeasurer(cacheSize = 4)
@@ -121,7 +124,13 @@ fun ParticleTextScreen(
     BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
-            .pointerInput(Unit) { detectTapGestures { restarts++ } },
+            .then(
+                if (restartOnTap) {
+                    Modifier.pointerInput(Unit) { detectTapGestures { restarts++ } }
+                } else {
+                    Modifier
+                },
+            ),
     ) {
         val width = constraints.maxWidth.toFloat()
         val height = constraints.maxHeight.toFloat()
@@ -141,6 +150,20 @@ fun ParticleTextScreen(
             time = time,
             unit = width / 100f,
         )
+    }
+}
+
+/**
+ * The screen that plays the particle text reel, opened from the settings: the reel, the way back,
+ * and the hint that a tap starts it over.
+ */
+@Composable
+fun ParticleTextScreen(
+    onNavigateBack: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier = modifier.fillMaxSize()) {
+        ParticleReel()
 
         ImmersiveTopBar(
             leadingContent = { ParticleBackButton(onClick = onNavigateBack) },

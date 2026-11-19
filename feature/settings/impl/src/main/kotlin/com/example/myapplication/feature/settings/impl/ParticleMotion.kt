@@ -1,5 +1,5 @@
-// The choreography of the particle reel is copied from another app's source: it is expressed as
-// raw seconds and curve coefficients, so the file level magic number rule is waived for it.
+// The choreography is expressed as raw seconds and curve coefficients, so the file level magic
+// number rule is waived for it.
 @file:Suppress("MagicNumber")
 
 package com.example.myapplication.feature.settings.impl
