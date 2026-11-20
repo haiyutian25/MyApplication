@@ -3,7 +3,7 @@
 
 # App version
 appVersionCode = "1"
-appVersionName = "0.0.1-beta.8"
+appVersionName = "0.0.1-beta.9"
 
 # SDK Versions
 compileSdk = "37"
