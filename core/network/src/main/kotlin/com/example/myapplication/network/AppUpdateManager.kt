@@ -32,12 +32,74 @@ class AppUpdateManager(
         const val GITHUB_REPO = "haiyutian25/MyApplication"
         const val GITHUB_REPO_URL = "https://github.com/haiyutian25/MyApplication"
         private const val RELEASES_API = "https://api.github.com/repos/haiyutian25/MyApplication/releases/latest"
+
+        /**
+         * 发布信息流：与 API 返回同一个 tag，但不按 IP 计数
+         */
+        private const val RELEASES_FEED = "https://github.com/haiyutian25/MyApplication/releases.atom"
+
+        /**
+         * 发布工作流给 APK 资产取的名字，后面接 tag
+         */
+        private const val APK_ASSET_PREFIX = "MyApplication-arm64-"
     }
 
     /**
      * 向 GitHub 请求最新 Release 信息并与当前版本比对
      */
     suspend fun checkUpdate(currentVersionName: String): Result<AppUpdateInfo> = withContext(Dispatchers.IO) {
+        // GitHub 的接口未认证时按 IP 每小时只放行 60 次，共用出口地址的用户很容易用完，
+        // 用完就返回 403。信息流带着同一个 tag，且不计数，所以 403 时改从信息流取，
+        // 而不是把“次数用完”当成“连不上”报给用户。
+        requestLatestRelease(currentVersionName).recoverCatching { error ->
+            val isRefused = error.message?.contains("403") == true
+            if (isRefused) latestReleaseFromFeed(currentVersionName) else throw error
+        }
+    }
+
+    /**
+     * 从发布信息流读取最新 tag
+     */
+    private fun latestReleaseFromFeed(currentVersionName: String): AppUpdateInfo {
+        val request = Request.Builder()
+            .url(RELEASES_FEED)
+            .header("User-Agent", "MyApplication/$currentVersionName")
+            .get()
+            .build()
+
+        httpClient.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) {
+                throw IllegalStateException("GitHub 响应错误 HTTP ${response.code}")
+            }
+            val feed = response.body.string()
+            val releaseUrl = Regex("<link[^>]+href=\"([^\"]+/releases/tag/[^\"]+)\"")
+                .find(feed)
+                ?.groupValues
+                ?.get(1)
+                ?: throw IllegalStateException("更新信息无法解析")
+            val tagName = releaseUrl.substringAfter("/releases/tag/")
+            val latestVersion = tagName.removePrefix("v").trim()
+
+            return AppUpdateInfo(
+                currentVersion = currentVersionName,
+                latestVersion = latestVersion.ifBlank { currentVersionName },
+                hasUpdate = isNewerVersion(latestVersion, currentVersionName),
+                releaseTitle = tagName,
+                releaseNotes = "",
+                releaseUrl = releaseUrl,
+                apkDownloadUrl = "$GITHUB_REPO_URL/releases/download/$tagName/$APK_ASSET_PREFIX$tagName.apk",
+                apkSizeBytes = null,
+                publishedAt = "",
+            )
+        }
+    }
+
+    /**
+     * 向 GitHub 接口请求最新 Release
+     */
+    private suspend fun requestLatestRelease(
+        currentVersionName: String,
+    ): Result<AppUpdateInfo> = withContext(Dispatchers.IO) {
         runCatching {
             val request = Request.Builder()
                 .url(RELEASES_API)
@@ -107,8 +169,9 @@ class AppUpdateManager(
      */
     suspend fun fetchReleaseNotes(versionName: String): Result<String> = withContext(Dispatchers.IO) {
         runCatching {
-            val clean = versionName.substringBefore('-').trim()
-            val tag = if (clean.startsWith("v")) clean else "v$clean"
+            // 整个版本号都是 tag 的一部分（v0.0.1-beta.8），截到 '-' 之前会查到一个不存在的
+            // tag，接口只会回 404。
+            val tag = if (versionName.startsWith("v")) versionName else "v$versionName"
             val request = Request.Builder()
                 .url("https://api.github.com/repos/$GITHUB_REPO/releases/tags/$tag")
                 .header("Accept", "application/vnd.github.v3+json")
